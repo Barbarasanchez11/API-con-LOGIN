@@ -6,7 +6,7 @@ const { generateToken, verifyToken } = require('../middlewares/middleware');
 const users = require('../data/users');
 const urlBase = 'https://rickandmortyapi.com/api/character';
 
-router.get('/', (req, res) => {
+router.get('/', (req, res) => {//si contraseña y user son válidos ->inicio sesión
     if (!req.session.token) {
         const loginForm = `
         <form action="/login" method="post">
@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
           <button type="submit">Iniciar sesión</button>
         </form>
         `;
-        res.send(loginForm);
+        res.send(loginForm); 
     } else { 
         res.send(`
             <h1>Bienvenido</h1>
@@ -31,9 +31,9 @@ router.get('/', (req, res) => {
     }
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', (req, res) => {//se genera token si user y contraseña son correctos
     const { username, password } = req.body; 
-    const user = users.find(user => user.username === username && user.password === password);
+    const user = users.find(user => user.username === username && user.password === password);//deben cumplirse las dos condiciones
 
     if (!user) {
         res.status(401).json({ message: 'Usuario incorrecto' });
@@ -44,7 +44,7 @@ router.post('/login', (req, res) => {
     }
 });
 
-router.get('/search', verifyToken, (req, res) => {
+router.get('/search', verifyToken, (req, res) => {//si el user está auteticado ->form para buscar o logout
     res.send(`
         <form action="/character" method="get">
             <label for="search">Buscar personaje:</label>
@@ -57,7 +57,7 @@ router.get('/search', verifyToken, (req, res) => {
     `);
 });
 
-router.get('/character', verifyToken, async (req, res) => {
+router.get('/character', verifyToken, async (req, res) => {//solicitud a la API y devuelve HTML
     const search = req.query.search;
     try {
         const response = await axios.get(`${urlBase}/?name=${search}`);
@@ -75,7 +75,7 @@ router.get('/character', verifyToken, async (req, res) => {
     }
 });
 
-router.get('/character/:nombre', verifyToken, async (req, res) => {
+router.get('/character/:nombre', verifyToken, async (req, res) => {//info de personaje, solicitud a la API devuelve HTML
     const name = req.params.nombre;
     try {
         const response = await axios.get(`${urlBase}?name=${name}`);
